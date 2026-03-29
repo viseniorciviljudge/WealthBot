@@ -1,0 +1,27 @@
+name: WealthCode Auto-Render
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcairo2-dev libpango1.0-dev ffmpeg
+          pip install manim edge-tts requests
+      - name: Generate AI Script and Render
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: |
+          python bot.py
+          manim -qm main.py WealthBotScene
+      - name: Upload Video
+        uses: actions/upload-artifact@v4
+        with:
+          name: Viral-Video
+          path: media/videos/main/720p30/WealthBotScene.mp4
